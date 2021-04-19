@@ -1,25 +1,26 @@
-import logo from './logo.svg';
 import './App.css';
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import { Grid } from '@material-ui/core';
+import PhotographsMain from './pages/photographs/PhotographsMain';
+import AlbumsMain from './pages/albums/AlbumsMain';
+import CreateAlbumMain from './pages/create_album/CreateAlbumMain';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+        <Grid>
+            <Switch>
+                <Route exact path="/photographs">
+                    <PhotographsMain />
+                </Route>
+                <Route exact path="/albums">
+                    <AlbumsMain />
+                </Route>
+                <Route exact path="/create_album">
+                    <CreateAlbumMain />
+                </Route>
+            </Switch>
+        </Grid>
+    </Router>
   );
 }
-
-export default App;
