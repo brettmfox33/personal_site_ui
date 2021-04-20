@@ -27,7 +27,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Album({imageSrc}) {
+export default function Album({title, coverSrc, description, date}) {
     const classes = useStyles();
 
     return (
@@ -35,7 +35,7 @@ export default function Album({imageSrc}) {
             <img 
                 className={classes.image}
                 alt="the_image" 
-                src={imageSrc} 
+                src={coverSrc} 
             /> 
             <Grid
                 container
@@ -43,13 +43,13 @@ export default function Album({imageSrc}) {
                 className={classes.albumInfo}
             >
                 <Grid className={classes.albumName} >
-                    Album Name
+                    {title}
                 </Grid>
                 <Grid className={classes.albumDate} >
-                    02-20-21
+                    {date}
                 </Grid>
                 <Grid className={classes.albumDescription} >
-                    Description of the album!
+                    {description}
                 </Grid>
             </Grid>
         </div>

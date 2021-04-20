@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {Button, Dialog, DialogContent, Grid, makeStyles, Modal, TextField } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Album from "./Album";
@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import FormControl from '@material-ui/core/FormControl';
+import { ErrorOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles({
     container: {
@@ -52,6 +53,22 @@ const images = [
 export default function AlbumsMain() {
     const classes = useStyles();
     const [showModal, setShowModal] = useState(false)
+    const [albums, setAlbums] = useState([])
+
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/api/albums/")
+          .then((res) => {
+                return res.json()
+            })
+          .then(
+            (result) => {
+                setAlbums(result)
+            },
+            (error) => {
+                console.log(error)
+            }
+          )
+      }, [])
 
      return (
         <div className={classes.container}>
@@ -72,24 +89,31 @@ export default function AlbumsMain() {
                         </SimpleIconButton>
                     </Grid>
                     {
-                        images.map(image_url => {
-                            return (
-                                <Grid 
-                                    className={classes.albumContainer}
-                                    item 
-                                    xs={10} 
-                                    md={6}
-                                >
-                                    <Link className={classes.link} to={`/photographs`}>
-                                        <Album
-                                            imageSrc={image_url}
-                                            albumName="AlbumName"
-                                            key={image_url}
-                                        />
-                                    </Link>
-                                </Grid>
-                            )
-                        })
+                        albums 
+                        ?
+                            albums.map(album => {
+                                console.log(album)
+                                return (
+                                    <Grid 
+                                        className={classes.albumContainer}
+                                        item 
+                                        xs={10} 
+                                        md={6}
+                                        key={album.uuid}
+                                    >
+                                        <Link className={classes.link} to={`/photographs`}>
+                                            <Album
+                                                coverSrc={album.cover_photo_url}
+                                                title={album.title}
+                                                description={album.description}
+                                                date={album.date}
+                                                key={album.uuid}
+                                            />
+                                        </Link>
+                                    </Grid>
+                                )
+                            })
+                        : null
                     }
                 </Grid>
                 {/* MODAL */}
