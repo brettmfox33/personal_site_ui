@@ -1,13 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
-import {Button, Dialog, DialogContent, Grid, makeStyles, Modal, TextField } from "@material-ui/core";
+import {Button, Dialog, DialogContent, Grid, makeStyles, TextField } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Album from "./Album";
 import SimpleIconButton from "../../components/SimpleIconButton";
 import AddIcon from '@material-ui/icons/Add';
 import {KeyboardDatePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import FormControl from '@material-ui/core/FormControl';
-import { ErrorOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles({
     container: {
@@ -44,31 +42,74 @@ const useStyles = makeStyles({
     }
 });
 
-const images = [
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0002.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0067+2.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0065.JPG"
-]
-
 export default function AlbumsMain() {
     const classes = useStyles();
     const [showModal, setShowModal] = useState(false)
     const [albums, setAlbums] = useState([])
+    const [albumName, setAlbumName] = useState("")
+    const [date, setDate] = useState(new Date('2014-08-18T21:11:54'))
+    const [description, setDescription] = useState("")
+    const [coverPhoto, setCoverPhoto] = useState(null)
+    const [formComplete, setFormComplete] = useState(false)
 
-    useEffect(() => {
+    const fetchAlbums = () => {
         fetch("http://127.0.0.1:8000/api/albums/")
-          .then((res) => {
+            .then((res) => {
                 return res.json()
             })
-          .then(
+            .then(
             (result) => {
                 setAlbums(result)
             },
             (error) => {
                 console.log(error)
             }
-          )
+        )
+    }
+    
+    useEffect(() => {
+        fetchAlbums()
       }, [])
+
+      useEffect(() => {
+          if (date && albumName && description && coverPhoto) {
+                setFormComplete(true)
+          }
+          else {
+                setFormComplete(false)
+          }
+      }, [albumName, date, description, coverPhoto])
+
+      const createAlbum = () => {
+            setFormComplete(false)
+            setShowModal(false)
+            setAlbumName("")
+            setDate(new Date('2014-08-18T21:11:54'))
+            setDescription("")
+            setCoverPhoto(null)
+            
+            const data = new FormData()
+            data.append('title', albumName)
+            data.append('description', description)
+            data.append('date', "2014-08-18")
+            data.append('cover_photo', coverPhoto)
+
+            fetch('http://127.0.0.1:8000/api/albums/', {
+                method: 'POST',
+                body: data
+            })
+            .then((res) => {
+                fetchAlbums()
+            })
+            .then(
+                (result) => {
+                    console.log(result)
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
+      }
 
      return (
         <div className={classes.container}>
@@ -92,7 +133,6 @@ export default function AlbumsMain() {
                         albums 
                         ?
                             albums.map(album => {
-                                console.log(album)
                                 return (
                                     <Grid 
                                         className={classes.albumContainer}
@@ -101,9 +141,9 @@ export default function AlbumsMain() {
                                         md={6}
                                         key={album.uuid}
                                     >
-                                        <Link className={classes.link} to={`/photographs`}>
+                                        <Link className={classes.link} to={`albums/${album.uuid}/photographs`}>
                                             <Album
-                                                coverSrc={album.cover_photo_url}
+                                                coverSrc={album.cover_photo}
                                                 title={album.title}
                                                 description={album.description}
                                                 date={album.date}
@@ -138,6 +178,8 @@ export default function AlbumsMain() {
                                     id="outlined-basic" 
                                     label="Album Name" 
                                     variant="outlined" 
+                                    value={albumName}
+                                    onChange={(e) => setAlbumName(e.target.value)}
                                 />    
                             </Grid>
                             <Grid className={classes.albumDate}>
@@ -149,8 +191,8 @@ export default function AlbumsMain() {
                                         format="MM/dd/yyyy"
                                         margin="normal"
                                         label="Album Date"
-                                        // value={selectedDate}
-                                        // onChange={handleDateChange}
+                                        value={date}
+                                        onChange={(e) => setDate(e)}
                                         KeyboardButtonProps={{
                                             'aria-label': 'change date', 
                                         }}
@@ -164,7 +206,10 @@ export default function AlbumsMain() {
                                     label="Album Description" 
                                     variant="outlined" 
                                     multiline
-                                    rows={4}               
+                                    rows={4}         
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}   
+                                       
                                 />
                             </Grid>
                             <Grid className={classes.coverImage}>
@@ -172,17 +217,25 @@ export default function AlbumsMain() {
                                     accept="image/*"
                                     className={classes.input}
                                     id="contained-button-file"
-                                    multiple
                                     type="file"
+                                    onChange={(e) => setCoverPhoto(e.target.files[0])} 
                                 />
                                 <label htmlFor="contained-button-file">
                                     <Button variant="contained" color="primary" component="span">
-                                    Cover Image
+                                        Cover Image
                                     </Button>
                                 </label>
+                                <span>{coverPhoto ? coverPhoto.name : null}</span>
                             </Grid>
                             <Grid>
-                                <Button variant="contained" color="primary">Create Album</Button>
+                                <Button 
+                                    variant="contained" 
+                                    color="primary"
+                                    disabled={!formComplete}
+                                    onClick={createAlbum}
+                                >
+                                    Create Album
+                                </Button>
                             </Grid>
                         </Grid>
                         </DialogContent>

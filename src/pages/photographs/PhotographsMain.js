@@ -1,12 +1,16 @@
-import {Grid, makeStyles } from "@material-ui/core";
+import {Grid, IconButton, makeStyles, Tooltip, withStyles } from "@material-ui/core";
 import Photograph from "./Photograph";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Fragment } from "react";
 import SimpleIconButton from "../../components/SimpleIconButton";
-import LibraryAddCheckIcon from '@material-ui/icons/LibraryAddCheck';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
+import AddIcon from '@material-ui/icons/Add';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import BrightnessLow from '@material-ui/icons/BrightnessLow';
+import { useParams } from "react-router";
+import GetAppIcon from '@material-ui/icons/GetApp';
+import { saveAs } from 'file-saver';
+var JSZip = require("jszip");
+var JSZipUtils = require("jszip-utils");
 
 const useStyles = makeStyles({
     container: {
@@ -18,7 +22,7 @@ const useStyles = makeStyles({
         paddingTop: 50,
         paddingBottom: 50
     },
-    selectAllButton: {
+    addButton: {
         color: '#f2f2f2',
         border: '1px solid #f2f2f2',
     },
@@ -40,22 +44,108 @@ const useStyles = makeStyles({
         color: "#f2f2f2",
         fontSize: 30,
         marginBottom: 20
-    }
+    },
+    input: {
+        display: 'none',
+    },
 });
 
-const images = [
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0002.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0035.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0054+1.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0067+2.JPG",
-    "https://brettmfox33-personal-website.s3.us-east-2.amazonaws.com/photographs/Bookstore/DSCF0065.JPG"
-]
+const NoHoverColorIconButton = withStyles((theme) => ({
+    root: {
+      '&:hover': {
+        backgroundColor: 'transparent',
+      },
+    },
+  }))(IconButton);
 
 export default function PhotographsMain() {
     const classes = useStyles();
     const [theatreView, setTheatreView] = useState(false);
-    const [selectAll, setSelectAll] = useState(false);
+    const { uuid } = useParams();
+    const [photographs, setPhotographs] = useState([])
+    const [album, setAlbum] = useState(null)
 
+    const fetchPhotographs = () => {
+        fetch(`http://127.0.0.1:8000/api/albums/${uuid}/photographs/`)
+            .then((res) => {
+                return res.json()
+            })
+            .then(
+            (result) => {
+                setPhotographs(result)
+            },
+            (error) => {
+                console.log(error)
+            }
+        )
+    }
+
+    const fetchAlbum = () => {
+        fetch(`http://127.0.0.1:8000/api/albums/${uuid}/`)
+            .then((res) => {
+                return res.json()
+            })
+            .then(
+            (result) => {
+                setAlbum(result)
+            },
+            (error) => {
+                console.log(error)
+            }
+        )
+    }
+
+    const urlToPromise = (url) => {
+        return new Promise(function(resolve, reject) {
+            JSZipUtils.getBinaryContent(url, function (err, data) {
+                if(err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            });
+        });
+        }
+
+    const downloadAll = () => {
+        var zip = new JSZip();
+        for (const photograph of photographs){
+            zip.file(photograph.title, urlToPromise(photograph.photo), {binary:true});
+        }
+        zip.generateAsync({type:"blob"})
+        .then(function callback(blob) {
+            saveAs(blob, "example.zip");
+        });
+    }
+    
+    const uploadImage = (files) => {
+        for (const file of files){
+            const data = new FormData()
+            data.append('title', file.title)
+            data.append('album', uuid)
+            data.append('photo', file)
+            fetch(`http://127.0.0.1:8000/api/albums/${uuid}/photographs/`, {
+                    method: 'POST',
+                    body: data
+            })
+            .then((res) => {
+                fetchPhotographs()
+            })
+            .then(
+                (result) => {
+                    console.log(result)
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
+        }  
+    }
+
+    useEffect(() => {
+        fetchPhotographs()
+        fetchAlbum()
+      }, [])
 
     return(
         <Grid 
@@ -79,7 +169,7 @@ export default function PhotographsMain() {
                         alignItems="center"
                         className={classes.albumName}
                     >
-                        Cats & Bookstores
+                        {album ? album.description : null}
                     </Grid>
                 </Grid>
             <Grid
@@ -106,18 +196,33 @@ export default function PhotographsMain() {
                             />
                         : 
                             <Fragment>
-                                {/* SELECT ALL */}
-                                <SimpleIconButton 
-                                    icon={<LibraryAddCheckIcon />}
-                                    className={classes.selectAllButton}
-                                    onClickFunction={() => setSelectAll(!selectAll)}
-                                    toolTipMessage={selectAll ? "Deselect All": "Select All"}
+                                {/* ADD */}
+                                <input
+                                    accept="image/*"
+                                    className={classes.input}
+                                    id="contained-button-file"
+                                    multiple
+                                    type="file"
+                                    onChange={(e) => uploadImage(e.target.files)} 
                                 />
+                                <label htmlFor="contained-button-file">
+                                    <Tooltip title="Add Images to Album">
+                                        <NoHoverColorIconButton  
+                                            component="span"
+                                            className={classes.addButton}
+                                            disableRipple={true}
+                                        >
+                                            <AddIcon />
+                                        </NoHoverColorIconButton>
+                                    </Tooltip>
+                                </label>
+                                
                                 {/* DOWNLOAD */}
                                 <SimpleIconButton 
-                                    icon={<SystemUpdateAltIcon />}
+                                    icon={<GetAppIcon />}
                                     className={classes.downloadButton}
-                                    toolTipMessage="Download Selected Photographs"
+                                    onClickFunction={() => downloadAll()}
+                                    toolTipMessage={"Download All"}
                                 />
                                 {/* THEATRE */}
                                 <SimpleIconButton 
@@ -132,14 +237,12 @@ export default function PhotographsMain() {
 
             </Grid>
                 {
-                    images.map(image_url => {
+                    photographs.map(photograph => {
                          return (
-                            <Grid item xs={10} md={8}>
+                            <Grid item xs={10} md={8} key={photograph.uuid}>
                                 <Photograph 
-                                    imageSrc={image_url} 
-                                    key={image_url} 
+                                    imageSrc={photograph.photo} 
                                     theatreView={theatreView}
-                                    selectAll={selectAll}
                                 />
                             </Grid>
                          )

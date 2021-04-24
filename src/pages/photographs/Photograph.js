@@ -3,6 +3,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
 import { useEffect, useState } from "react";
 import SimpleIconButton from "../../components/SimpleIconButton";
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 
 const useStyles = makeStyles({
     image: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles({
         marginTop: 25,
         marginBottom: 25,
     },
-    checkBox: {
+    downloadIcon: {
         width: 40,
         height:30,
         color: '#f2f2f2'
@@ -33,14 +34,27 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Photograph({imageSrc, theatreView, selectAll}) {
+export default function Photograph({imageSrc, theatreView}) {
     const classes = useStyles();
-    const [selected, setSelected] = useState(selectAll)
-
-    useEffect(() => {
-        setSelected(selectAll)
-    }, [selectAll])
     
+    const downloadImage = () => {
+        fetch(imageSrc, {
+            method: "GET",
+            headers: {}
+          }).then(response => {
+            response.arrayBuffer().then(function(buffer) {
+              const link = document.createElement("a");
+              link.href = window.URL.createObjectURL(new Blob([buffer]));
+              link.setAttribute("download", "image.png");
+              document.body.appendChild(link);
+              link.click();
+            });
+          })
+          .catch(err => {
+            console.log(err);
+          });
+    }
+
     return (
         <div className={classes.imageContainer}>
             <img 
@@ -52,16 +66,12 @@ export default function Photograph({imageSrc, theatreView, selectAll}) {
                 theatreView
                 ? 
                     null
-                : 
+                :   
                     <SimpleIconButton
                         className={classes.iconButton}
-                        onClickFunction={() => setSelected(!selected)}
-                        icon={
-                            selected
-                            ? <CheckCircleOutlineIcon className={classes.checkBox} />
-                            : <RadioButtonUncheckedIcon className={classes.checkBox} />
-                        }
-                        toolTipMessage="Select Image"
+                        onClickFunction={() => downloadImage()}
+                        icon={<SystemUpdateAltIcon className={classes.downloadIcon} />}
+                        toolTipMessage="Download Image"
                     >
                     </SimpleIconButton>
             }
