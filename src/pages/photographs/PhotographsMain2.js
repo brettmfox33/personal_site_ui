@@ -1,8 +1,10 @@
-import {Grid, makeStyles, Divider, Button } from "@material-ui/core";
+import {Grid, makeStyles, Divider, Button, IconButton } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { saveAs } from 'file-saver';
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace';
 import Photograph from "./Photograph2";
+import { Link } from "react-router-dom";
 var JSZip = require("jszip");
 var JSZipUtils = require("jszip-utils");
 
@@ -47,6 +49,10 @@ const useStyles = makeStyles({
         fontSize: 15,
         color: "white",
         marginTop: 10
+    },
+    arrow: {
+        cursor: "pointer",
+        color: 'black'
     }
 })
 export default function PhotographsMain() {
@@ -112,6 +118,9 @@ export default function PhotographsMain() {
                     ?
                         <Grid container direction="column">
                             {/* HEADER */}
+                            <Grid>
+                                <Link to="/albums/"><KeyboardBackspaceIcon className={classes.arrow} /></Link>
+                            </Grid>
                             <Grid>
                                 <Grid container direction="row" alignItems="center">
                                     <Grid item className={theatreView ? classes.theatreAlbumTitle : classes.albumTitle}>{album.title}</Grid>

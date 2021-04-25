@@ -40,10 +40,10 @@ export default function Album({album}) {
     const classes = useStyles();
 
     return (
-        <Link className={classes.link} to={`albums/${album.uuid}/photographs`}>
+        <Link className={classes.link} to={`/albums/${album.uuid}/photographs`}>
             <Grid container direction="column" className={classes.innerAlbumContainer}>
                 <Grid>
-                    <img alt="imagfee" src={album.cover_photo} className={classes.coverImage} />
+                    <img alt={album.title} src={album.cover_photo} className={classes.coverImage} />
                 </Grid>
                 <Grid container direction="row" className={classes.coverTitle} justify="space-between" alignItems="center">
                     <Grid item >{album.title}</Grid>
