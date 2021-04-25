@@ -15,6 +15,9 @@ export default function App() {
                 <Route exact path="/albums/:uuid/photographs">
                     <PhotographsMain />
                 </Route>
+                <Route exact path="/">
+                    <AlbumsMain />
+                </Route>
             </Switch>
         </Grid>
     </Router>

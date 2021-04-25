@@ -60,8 +60,9 @@ const NoHoverColorIconButton = withStyles((theme) => ({
 
 export default function PhotographsMain() {
     const classes = useStyles();
-    const [theatreView, setTheatreView] = useState(false);
     const { uuid } = useParams();
+
+    const [theatreView, setTheatreView] = useState(false);
     const [photographs, setPhotographs] = useState([])
     const [album, setAlbum] = useState(null)
 
@@ -105,7 +106,7 @@ export default function PhotographsMain() {
                 }
             });
         });
-        }
+    }
 
     const downloadAll = () => {
         var zip = new JSZip();
@@ -114,14 +115,14 @@ export default function PhotographsMain() {
         }
         zip.generateAsync({type:"blob"})
         .then(function callback(blob) {
-            saveAs(blob, "example.zip");
+            saveAs(blob, `${uuid}.zip`);
         });
     }
     
     const uploadImage = (files) => {
         for (const file of files){
             const data = new FormData()
-            data.append('title', file.title)
+            data.append('title', file.name)
             data.append('album', uuid)
             data.append('photo', file)
             fetch(`http://127.0.0.1:8000/api/albums/${uuid}/photographs/`, {
@@ -241,7 +242,8 @@ export default function PhotographsMain() {
                          return (
                             <Grid item xs={10} md={8} key={photograph.uuid}>
                                 <Photograph 
-                                    imageSrc={photograph.photo} 
+                                    imageSrc={photograph.photo}
+                                    imageTitle={photograph.title}
                                     theatreView={theatreView}
                                 />
                             </Grid>

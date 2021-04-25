@@ -1,7 +1,4 @@
 import { makeStyles } from "@material-ui/core";
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked';
-import { useEffect, useState } from "react";
 import SimpleIconButton from "../../components/SimpleIconButton";
 import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 
@@ -34,7 +31,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function Photograph({imageSrc, theatreView}) {
+export default function Photograph({imageSrc, theatreView, imageTitle}) {
     const classes = useStyles();
     
     const downloadImage = () => {
@@ -45,7 +42,7 @@ export default function Photograph({imageSrc, theatreView}) {
             response.arrayBuffer().then(function(buffer) {
               const link = document.createElement("a");
               link.href = window.URL.createObjectURL(new Blob([buffer]));
-              link.setAttribute("download", "image.png");
+              link.setAttribute("download", imageTitle);
               document.body.appendChild(link);
               link.click();
             });
