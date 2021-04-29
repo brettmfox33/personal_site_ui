@@ -53,6 +53,10 @@ const useStyles = makeStyles({
     arrow: {
         cursor: "pointer",
         color: 'black'
+    },
+    theatreArrow: {
+        cursor: "pointer",
+        color: 'white'
     }
 })
 export default function PhotographsMain() {
@@ -119,15 +123,14 @@ export default function PhotographsMain() {
                         <Grid container direction="column">
                             {/* HEADER */}
                             <Grid>
-                                <Link to="/albums/"><KeyboardBackspaceIcon className={classes.arrow} /></Link>
+                                <Link to="/albums/"><KeyboardBackspaceIcon className={theatreView ? classes.theatreArrow : classes.arrow} /></Link>
                             </Grid>
                             <Grid>
                                 <Grid container direction="row" alignItems="center">
                                     <Grid item className={theatreView ? classes.theatreAlbumTitle : classes.albumTitle}>{album.title}</Grid>
-                                    <Grid item xs={12} sm={2} lg={1} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.date}</Grid>
-                                    <Grid item xs={12} sm={2} lg={1} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.location}</Grid>
-                                    <Grid item xs={12} sm={2} lg={1} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.photographs.length} photos</Grid>
-                                    <Grid item md={2} lg={1}></Grid>
+                                    <Grid item xs={12} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.date}</Grid>
+                                    <Grid item xs={12} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.location}</Grid>
+                                    <Grid item xs={12} className={theatreView ? classes.theatreAlbumDetails : classes.albumDetails}>{album.photographs.length} photos</Grid>
                                 </Grid>
                                 <Grid container direction="row" alignItems="center" justify="space-between">
                                     <Grid className={theatreView ? classes.theatreAlbumDescription : classes.albumDescription}>
