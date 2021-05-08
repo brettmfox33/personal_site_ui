@@ -53,7 +53,7 @@ export default function AlbumsMain() {
     const [formComplete, setFormComplete] = useState(false)
 
     const fetchAlbums = () => {
-        fetch("http://127.0.0.1:8000/api/albums/")
+        fetch("http://localhost:8000/api/albums/")
             .then((res) => {
                 return res.json()
             })
@@ -94,7 +94,7 @@ export default function AlbumsMain() {
             data.append('date', "2014-08-18")
             data.append('cover_photo', coverPhoto)
 
-            fetch('http://127.0.0.1:8000/api/albums/', {
+            fetch('http://localhost:8000/api/albums/', {
                 method: 'POST',
                 body: data
             })

@@ -21,7 +21,7 @@ export default function AlbumsMain() {
     const [albums, setAlbums] = useState([])
 
     const fetchAlbums = () => {
-        fetch("http://127.0.0.1:8000/api/albums/")
+        fetch("http://localhost:8000/api/albums/")
             .then((res) => {
                 return res.json()
             })

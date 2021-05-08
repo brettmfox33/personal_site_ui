@@ -67,7 +67,7 @@ export default function PhotographsMain() {
     const [theatreView, setTheatreView] = useState(false);
 
     const fetchAlbum = () => {
-        fetch(`http://127.0.0.1:8000/api/albums/${uuid}/`)
+        fetch(`http://localhost:8000/api/albums/${uuid}/`)
             .then((res) => {
                 return res.json()
             })
