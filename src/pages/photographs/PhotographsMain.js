@@ -67,7 +67,7 @@ export default function PhotographsMain() {
     const [album, setAlbum] = useState(null)
 
     const fetchPhotographs = () => {
-        fetch(`http://localhost:8000/api/albums/${uuid}/photographs/`)
+        fetch(`http://personal-site-api-dev.us-east-2.elasticbeanstalk.com/api/albums/${uuid}/photographs/`)
             .then((res) => {
                 return res.json()
             })
@@ -82,7 +82,7 @@ export default function PhotographsMain() {
     }
 
     const fetchAlbum = () => {
-        fetch(`http://localhost:8000/api/albums/${uuid}/`)
+        fetch(`http://personal-site-api-dev.us-east-2.elasticbeanstalk.com/api/albums/${uuid}/`)
             .then((res) => {
                 return res.json()
             })
@@ -125,7 +125,7 @@ export default function PhotographsMain() {
             data.append('title', file.name)
             data.append('album', uuid)
             data.append('photo', file)
-            fetch(`http://localhost:8000/api/albums/${uuid}/photographs/`, {
+            fetch(`hhttp://personal-site-api-dev.us-east-2.elasticbeanstalk.com/api/albums/${uuid}/photographs/`, {
                     method: 'POST',
                     body: data
             })

@@ -21,7 +21,7 @@ export default function AlbumsMain() {
     const [albums, setAlbums] = useState([])
 
     const fetchAlbums = () => {
-        fetch("http://localhost:8000/api/albums/")
+        fetch("http://personal-site-api-dev.us-east-2.elasticbeanstalk.com/api/albums/")
             .then((res) => {
                 return res.json()
             })
